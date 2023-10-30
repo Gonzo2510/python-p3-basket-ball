@@ -182,3 +182,73 @@ def game_dict():
             ]
         }
     }
+
+def all_player_data():
+    players = []
+    for team in game_dict():
+        for player in game_dict()[team]['players']:
+            players.append(player)
+    return players
+
+def get_player_stat(player_name, stat):
+    for player_obj in all_player_data():
+        for key in player_obj:
+            if key == stat:
+                if player_obj['name'] == player_name:
+                    return(player_obj[stat])
+
+def get_team_info(input_team_name, info):
+    for home_away in game_dict():
+        if game_dict()[home_away]['team_name'] == input_team_name:
+            #print(game_dict()[home_away][info])
+            return game_dict()[home_away][info]
+
+
+def num_points_per_game(player):
+    return get_player_stat(player, 'points_per_game')
+
+def player_age(player):
+    return get_player_stat(player, 'age')
+
+def team_colors(input_team_name):
+    return get_team_info(input_team_name, 'colors')
+
+def team_names():
+    team_list = []
+    for home_away in game_dict():
+        team_list.append(game_dict()[home_away]["team_name"])
+    return team_list
+    
+def player_numbers(input_team_name):
+    jersey_numbers = []
+    for player_obj in get_team_info(input_team_name, 'players'):
+        jersey_numbers.append(get_player_stat(player_obj['name'], 'number'))
+    return jersey_numbers
+    
+def player_stats(player):
+    for player_obj in all_player_data():
+        if player_obj['name'] == player:
+            return player_obj
+
+def average_rebounds_by_shoe_brand():
+    shoes_rebounds = {}
+    result = ''
+    for player in all_player_data():
+        if player['shoe_brand'] not in shoes_rebounds:
+            shoes_rebounds.update({player['shoe_brand'] : [player["rebounds_per_game"]]})
+        elif player['shoe_brand'] in shoes_rebounds:
+            shoes_rebounds[player['shoe_brand']].append(player["rebounds_per_game"])
+    for brand in shoes_rebounds:
+        accumulator = 0
+        length = len(shoes_rebounds[brand])
+        count = 0
+        for number in shoes_rebounds[brand]:
+            accumulator += number
+            count += 1
+            if count == length:
+                average = round(accumulator/length, 2)
+                average = f'{average:.2f}'
+                shoes_rebounds[brand].clear()
+                count = 0
+                result += (f"{brand}:  {average}\n")
+    print(result.rstrip())
